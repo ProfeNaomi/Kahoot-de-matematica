@@ -177,7 +177,7 @@ io.on('connection', (socket) => {
     qrcode.toDataURL(joinUrl, {
       width: 450,
       margin: 2,
-      color: { dark: '#ffffff', light: '#0a0e1700' }
+      color: { dark: '#ffffff', light: '#0a0e17' }
     }).then(qrDataUrl => {
       socket.emit('game-created', {
         pin,
