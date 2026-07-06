@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Creador de Cuestionarios | K-Math Live</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    .hidden { display: none !important; }
+
+    .question-card {
+      background: rgba(23, 32, 53, 0.8);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      margin-bottom: 24px;
+      position: relative;
+    }
+
+    .question-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .options-edit-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .option-input-box {
+      padding: 16px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .opt-box-0 { background: var(--color-red-bg); border-left: 4px solid var(--color-red); }
+    .opt-box-1 { background: var(--color-blue-bg); border-left: 4px solid var(--color-blue); }
+    .opt-box-2 { background: var(--color-yellow-bg); border-left: 4px solid var(--color-yellow); }
+    .opt-box-3 { background: var(--color-green-bg); border-left: 4px solid var(--color-green); }
+  </style>
+</head>
+<body>
+
+  <header class="app-header">
+    <a href="index.html" class="logo">
+      🧮 K-Math Live <span>CREADOR DE JUEGOS</span>
+    </a>
+    <div style="display: flex; gap: 12px;">
+      <button id="soundToggle" class="btn btn-outline" style="padding: 8px 16px;">🔊</button>
+      <button onclick="showNewQuizForm()" class="btn btn-primary">➕ Nuevo Cuestionario</button>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- SECCIÓN 1: LISTADO Y EXPORTACIÓN/IMPORTACIÓN -->
+    <section id="listSection">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 30px;">
+        <div>
+          <h1 style="font-size: 2.5rem;">Mis Cuestionarios de Matemáticas</h1>
+          <p style="color: var(--text-muted);">Crea, edita o exporta juegos para tu clase o para tu plataforma del hogar:</p>
+        </div>
+        <div style="display: flex; gap: 12px;">
+          <label class="btn btn-outline" style="cursor: pointer;">
+            📥 Importar JSON
+            <input type="file" id="importFileInput" accept=".json" style="display: none;">
+          </label>
+        </div>
+      </div>
+
+      <div id="quizListGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 24px;">
+        <!-- Tarjetas de cuestionarios creadas dinámicamente -->
+      </div>
+    </section>
+
+    <!-- SECCIÓN 2: FORMULARIO EDITOR DE CUESTIONARIOS -->
+    <section id="editorSection" class="hidden">
+      <div class="glass-panel" style="padding: 36px; max-width: 900px; margin: 0 auto;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; border-bottom: 1px solid var(--border-color); padding-bottom: 16px;">
+          <h2 id="editorTitle" style="font-size: 2rem;">✏️ Editar Cuestionario</h2>
+          <button onclick="hideEditor()" class="btn btn-outline">❌ Volver al Listado</button>
+        </div>
+
+        <form id="quizForm" style="display: flex; flex-direction: column; gap: 20px;">
+          <input type="hidden" id="quizId">
+
+          <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 16px;">
+            <div>
+              <label style="font-weight: 700; font-size: 0.9rem; color: var(--text-muted);">TÍTULO DEL JUEGO</label>
+              <input type="text" id="quizTitle" class="input-field" placeholder="Ej: Reto de Álgebra y Ecuaciones" required>
+            </div>
+            <div>
+              <label style="font-weight: 700; font-size: 0.9rem; color: var(--text-muted);">CATEGORÍA / MATERIA</label>
+              <input type="text" id="quizCategory" class="input-field" placeholder="Ej: Álgebra" required>
+            </div>
+          </div>
+
+          <div>
+            <label style="font-weight: 700; font-size: 0.9rem; color: var(--text-muted);">DESCRIPCIÓN (Opcional)</label>
+            <input type="text" id="quizDesc" class="input-field" placeholder="Breve descripción de lo que evaluará este cuestionario...">
+          </div>
+
+          <div style="margin-top: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+              <h3 style="font-size: 1.5rem; color: var(--color-purple);">❓ Preguntas del Cuestionario</h3>
+              <button type="button" onclick="addQuestionCard()" class="btn btn-success" style="padding: 10px 20px;">
+                ➕ Agregar Pregunta
+              </button>
+            </div>
+
+            <div id="questionsContainer">
+              <!-- Tarjetas de preguntas se insertan aquí -->
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 16px; margin-top: 30px; border-top: 1px solid var(--border-color); padding-top: 24px;">
+            <button type="button" onclick="hideEditor()" class="btn btn-outline">Cancelar</button>
+            <button type="submit" class="btn btn-primary" style="padding: 16px 36px; font-size: 1.2rem;">
+              💾 Guardar en Servidor
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="js/common.js"></script>
+  <script src="js/creator.js"></script>
+</body>
+</html>

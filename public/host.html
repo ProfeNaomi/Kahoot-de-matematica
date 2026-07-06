@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sala del Profesor | K-Math Live</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    .hidden { display: none !important; }
+    
+    /* Selector de cuestionario inicial */
+    .quiz-selector {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      margin-top: 24px;
+    }
+    
+    .quiz-card {
+      padding: 24px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border-left: 5px solid var(--color-purple);
+    }
+
+    /* Gráfico de barras de resultados */
+    .results-chart {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      height: 250px;
+      align-items: flex-end;
+      margin: 30px 0;
+      padding-bottom: 20px;
+      border-bottom: 2px solid var(--border-color);
+    }
+
+    .chart-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 100%;
+      justify-content: flex-end;
+    }
+
+    .chart-bar {
+      width: 80%;
+      border-radius: 8px 8px 0 0;
+      transition: height 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding-top: 10px;
+      font-weight: 800;
+      font-size: 1.5rem;
+      color: white;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    }
+
+    .bar-0 { background: var(--color-red); }
+    .bar-1 { background: var(--color-blue); }
+    .bar-2 { background: var(--color-yellow); }
+    .bar-3 { background: var(--color-green); }
+  </style>
+</head>
+<body>
+
+  <header class="app-header">
+    <a href="index.html" class="logo">
+      🧮 K-Math Live <span>PROYECTOR / HOST</span>
+    </a>
+    <div style="display: flex; gap: 16px; align-items: center;">
+      <div id="pinBadge" class="hidden" style="background: rgba(255, 215, 0, 0.15); border: 1px solid var(--color-gold); padding: 6px 18px; border-radius: 999px; font-weight: 800; font-size: 1.2rem; color: var(--color-gold);">
+        PIN: <span id="headerPin">----</span>
+      </div>
+      <button id="soundToggle" class="btn btn-outline" style="padding: 8px 16px;">🔊</button>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- PANTALLA 0: SELECCIÓN DE JUEGO -->
+    <section id="selectScreen">
+      <div style="text-align: center; margin-bottom: 30px;">
+        <h1 style="font-size: 2.8rem;">Selecciona un Juego de Matemáticas</h1>
+        <p style="color: var(--text-muted); font-size: 1.1rem;">Elige cuál cuestionario deseas proyectar para tu clase el día de hoy:</p>
+      </div>
+      <div id="quizList" class="quiz-selector">
+        <div style="text-align: center; grid-column: 1/-1; padding: 40px; color: var(--text-muted);">
+          Cargando cuestionarios disponibles...
+        </div>
+      </div>
+    </section>
+
+    <!-- PANTALLA 1: LOBBY DE ESPERA (QR y PIN) -->
+    <section id="lobbyScreen" class="hidden">
+      <div class="lobby-container">
+        
+        <!-- Panel Izquierdo: Instrucciones y QR -->
+        <div class="glass-panel qr-box">
+          <span style="background: var(--color-purple); color: white; padding: 4px 12px; border-radius: 6px; font-weight: 700; font-size: 0.85rem; text-transform: uppercase;">
+            Paso 1: Escanea con la cámara
+          </span>
+          
+          <div class="qr-image-wrapper">
+            <img id="qrImage" src="" alt="Código QR para unirse">
+          </div>
+
+          <p style="font-size: 0.95rem; color: var(--text-muted); margin-bottom: 12px;">
+            O entra en el navegador móvil a: <br>
+            <strong id="joinUrlText" style="color: white; font-size: 1.05rem;">http://...</strong>
+          </p>
+
+          <div style="width: 100%; border-top: 1px solid var(--border-color); margin: 12px 0; padding-top: 12px;">
+            <span style="color: var(--text-muted); font-size: 0.9rem;">Paso 2: Ingresa el PIN</span>
+            <div id="mainPin" class="pin-display">----</div>
+          </div>
+        </div>
+
+        <!-- Panel Derecho: Jugadores Conectados -->
+        <div class="glass-panel" style="padding: 30px; display: flex; flex-direction: column;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border-color);">
+            <div>
+              <h2 style="font-size: 2rem;">Estudiantes en Sala</h2>
+              <p style="color: var(--text-muted);">Esperando a que escaneen el código...</p>
+            </div>
+            <div style="background: rgba(38, 137, 12, 0.2); border: 1px solid var(--color-green); padding: 10px 24px; border-radius: var(--radius-full); font-size: 1.8rem; font-weight: 800; color: #4cc900;">
+              👥 <span id="playerCount">0</span>
+            </div>
+          </div>
+
+          <div id="playersGrid" class="players-grid">
+            <!-- Los chips de jugadores aparecerán aquí animadamente -->
+          </div>
+
+          <div style="margin-top: auto; padding-top: 20px; display: flex; justify-content: flex-end;">
+            <button id="btnStartGame" class="btn btn-success" style="font-size: 1.3rem; padding: 18px 40px;" disabled>
+              🚀 ¡INICIAR PARTIDA!
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- PANTALLA 2: PREGUNTA EN CURSO -->
+    <section id="questionScreen" class="hidden" style="display: flex; flex-direction: column; flex: 1;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        <span id="questionCounter" style="font-weight: 700; font-size: 1.2rem; color: #a5b4fc;">Pregunta 1 de 8</span>
+        <div style="background: rgba(255,255,255,0.1); padding: 8px 20px; border-radius: var(--radius-full); font-weight: 800; font-size: 1.2rem;">
+          ⏱️ <span id="timeLeft">15</span>s
+        </div>
+        <div style="background: rgba(19, 104, 206, 0.2); border: 1px solid var(--color-blue); padding: 8px 20px; border-radius: var(--radius-full); font-weight: 800; font-size: 1.2rem; color: #60a5fa;">
+          📝 Respuestas: <span id="answeredCount">0</span> / <span id="totalPlayersCount">0</span>
+        </div>
+      </div>
+
+      <!-- Barra de temporizador animada -->
+      <div class="timer-container">
+        <div id="timerBar" class="timer-bar" style="width: 100%;"></div>
+      </div>
+
+      <!-- Enunciado de la Pregunta -->
+      <div class="glass-panel" style="padding: 40px; text-align: center; margin-bottom: 24px; min-height: 180px; display: flex; align-items: center; justify-content: center;">
+        <h2 id="questionText" style="font-size: 2.6rem; line-height: 1.3;">¿Cuánto es 15 + 28?</h2>
+      </div>
+
+      <!-- 4 Opciones de Respuesta -->
+      <div id="optionsContainer" class="options-grid">
+        <div class="option-btn opt-0">
+          <div class="shape-icon">▲</div>
+          <span id="opt0Text">Opción A</span>
+        </div>
+        <div class="option-btn opt-1">
+          <div class="shape-icon">◆</div>
+          <span id="opt1Text">Opción B</span>
+        </div>
+        <div class="option-btn opt-2">
+          <div class="shape-icon">●</div>
+          <span id="opt2Text">Opción C</span>
+        </div>
+        <div class="option-btn opt-3">
+          <div class="shape-icon">■</div>
+          <span id="opt3Text">Opción D</span>
+        </div>
+      </div>
+
+      <div style="text-align: right; margin-top: 20px;">
+        <button id="btnSkipTimer" class="btn btn-outline" style="padding: 10px 24px;">
+          ⏭️ Cortar Tiempo / Ver Resultados
+        </button>
+      </div>
+    </section>
+
+    <!-- PANTALLA 3: RESULTADOS DE LA PREGUNTA -->
+    <section id="resultsScreen" class="hidden">
+      <div class="glass-panel" style="padding: 40px; text-align: center;">
+        <h2 style="font-size: 2.5rem; margin-bottom: 10px;">Estadísticas de la Pregunta</h2>
+        <p id="correctAnswerText" style="font-size: 1.4rem; color: #4cc900; font-weight: 700; margin-bottom: 20px;">
+          ✓ La respuesta correcta era: Opción X
+        </p>
+
+        <!-- Gráfico de barras -->
+        <div class="results-chart">
+          <div class="chart-col">
+            <div id="bar0" class="chart-bar bar-0" style="height: 5%;">0</div>
+            <span style="margin-top: 10px; font-weight: 700;">▲ Rojo</span>
+          </div>
+          <div class="chart-col">
+            <div id="bar1" class="chart-bar bar-1" style="height: 5%;">0</div>
+            <span style="margin-top: 10px; font-weight: 700;">◆ Azul</span>
+          </div>
+          <div class="chart-col">
+            <div id="bar2" class="chart-bar bar-2" style="height: 5%;">0</div>
+            <span style="margin-top: 10px; font-weight: 700;">● Amarillo</span>
+          </div>
+          <div class="chart-col">
+            <div id="bar3" class="chart-bar bar-3" style="height: 5%;">0</div>
+            <span style="margin-top: 10px; font-weight: 700;">■ Verde</span>
+          </div>
+        </div>
+
+        <!-- Top 5 Parcial -->
+        <div style="max-width: 600px; margin: 0 auto 30px; text-align: left;">
+          <h3 style="font-size: 1.3rem; margin-bottom: 12px; text-align: center; color: var(--color-gold);">🏆 Top 5 Parcial</h3>
+          <div id="top5List" style="display: flex; flex-direction: column; gap: 8px;"></div>
+        </div>
+
+        <button id="btnNextQuestion" class="btn btn-primary" style="font-size: 1.3rem; padding: 18px 48px;">
+          Siguiente Pregunta ➡️
+        </button>
+      </div>
+    </section>
+
+    <!-- PANTALLA 4: PODIO FINAL -->
+    <section id="podiumScreen" class="hidden">
+      <div style="text-align: center; margin-bottom: 20px;">
+        <h1 style="font-size: 3.5rem; color: var(--color-gold); text-shadow: 0 0 30px rgba(255,215,0,0.5);">
+          🏆 ¡PODIO DE CAMPEONES! 🏆
+        </h1>
+        <p style="font-size: 1.2rem; color: var(--text-muted);">Así quedó la tabla de posiciones final de la clase:</p>
+      </div>
+
+      <div id="podiumBox" class="podium-container">
+        <!-- 2do Lugar -->
+        <div id="place2" class="podium-place place-2 hidden">
+          <div class="winner-avatar" id="avatar2">🥈</div>
+          <div class="winner-name" id="name2">Alumno</div>
+          <div class="winner-score" id="score2">0 pts</div>
+          <div class="podium-bar">2</div>
+        </div>
+
+        <!-- 1er Lugar -->
+        <div id="place1" class="podium-place place-1 hidden">
+          <div class="winner-avatar" id="avatar1">👑</div>
+          <div class="winner-name" id="name1">Alumno</div>
+          <div class="winner-score" id="score1">0 pts</div>
+          <div class="podium-bar">1</div>
+        </div>
+
+        <!-- 3er Lugar -->
+        <div id="place3" class="podium-place place-3 hidden">
+          <div class="winner-avatar" id="avatar3">🥉</div>
+          <div class="winner-name" id="name3">Alumno</div>
+          <div class="winner-score" id="score3">0 pts</div>
+          <div class="podium-bar">3</div>
+        </div>
+      </div>
+
+      <!-- Lista completa del resto del curso -->
+      <div class="glass-panel" style="max-width: 800px; margin: 0 auto; padding: 30px;">
+        <h3 style="font-size: 1.5rem; margin-bottom: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
+          📊 Tabla General de la Clase
+        </h3>
+        <div id="fullStandings" style="display: flex; flex-direction: column; gap: 10px; max-height: 300px; overflow-y: auto;"></div>
+
+        <div style="display: flex; justify-content: space-between; margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--border-color);">
+          <a href="host.html" class="btn btn-outline">🔄 Elegir Otro Juego</a>
+          <button id="btnExportStats" class="btn btn-success">📤 Exportar Resultados (JSON)</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Socket.io cliente (intenta local primero, luego CDN) -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    if (typeof io === 'undefined') {
+      document.write('<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"><\/script>');
+    }
+  </script>
+  <script src="js/common.js"></script>
+  <script src="js/host.js"></script>
+</body>
+</html>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>K-Math Live | Juegos Didácticos de Matemática</title>
+  <meta name="description" content="Plataforma interactiva de cuestionarios y juegos de matemáticas en tiempo real al estilo Kahoot.">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <header class="app-header">
+    <a href="index.html" class="logo">
+      🧮 K-Math Live <span>PROFESOR & AULA</span>
+    </a>
+    <div style="display: flex; gap: 12px; align-items: center;">
+      <button id="soundToggle" class="btn btn-outline" style="padding: 8px 16px; font-size: 1.2rem;" title="Activar/Desactivar Sonidos">
+        🔊
+      </button>
+      <a href="creator.html" class="btn btn-outline" style="padding: 10px 20px;">
+        🛠️ Crear Cuestionario
+      </a>
+    </div>
+  </header>
+
+  <main class="container">
+    <div style="text-align: center; margin-top: 20px; max-width: 800px; margin-left: auto; margin-right: auto;">
+      <span style="background: rgba(112, 0, 255, 0.2); color: #a5b4fc; padding: 6px 16px; border-radius: 999px; font-weight: 700; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; border: 1px solid rgba(112, 0, 255, 0.4);">
+        Plataforma Didáctica en Vivo
+      </span>
+      <h1 style="font-size: 3.5rem; margin: 20px 0 16px; line-height: 1.1;">
+        Aprendizaje de Matemática <span style="background: linear-gradient(135deg, #ff4d6d, #ffd700); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Emocionante y en Vivo</span>
+      </h1>
+      <p style="font-size: 1.2rem; color: var(--text-muted); line-height: 1.6;">
+        Conecta a tus estudiantes al instante escaneando un Código QR con su celular. Sin instalar aplicaciones, con estadísticas en tiempo real e integrado directamente en la red Wi-Fi de tu salón o plataforma del hogar.
+      </p>
+    </div>
+
+    <div class="mode-grid">
+      
+      <!-- Tarjeta 1: Profesor / Proyector -->
+      <a href="host.html" class="glass-panel glass-panel-hover mode-card host">
+        <div>
+          <div class="mode-icon">🖥️</div>
+          <h2 class="mode-title">Dirigir Partida (Proyector)</h2>
+          <p class="mode-desc">
+            Abre esta vista en la computadora del profesor o proyector del aula. Generará automáticamente un Código QR y un PIN para que los alumnos se unan y vean las preguntas en pantalla grande.
+          </p>
+        </div>
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 20px; color: var(--color-purple); font-weight: 800;">
+          <span>INICIAR SALA DE CLASE</span>
+          <span style="font-size: 1.5rem;">→</span>
+        </div>
+      </a>
+
+      <!-- Tarjeta 2: Estudiante / Celular -->
+      <a href="play.html" class="glass-panel glass-panel-hover mode-card play">
+        <div>
+          <div class="mode-icon">📱</div>
+          <h2 class="mode-title">Mando del Estudiante</h2>
+          <p class="mode-desc">
+            Abre esta vista en los celulares o tablets de los alumnos. Te pedirá el PIN de 4 dígitos o puedes entrar directo al escanear el QR. Conviértete en el rey del cálculo mental y gana puntos.
+          </p>
+        </div>
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 20px; color: var(--color-green); font-weight: 800;">
+          <span>UNIRSE A UN JUEGO</span>
+          <span style="font-size: 1.5rem;">→</span>
+        </div>
+      </a>
+
+      <!-- Tarjeta 3: Creador de Cuestionarios -->
+      <a href="creator.html" class="glass-panel glass-panel-hover mode-card create">
+        <div>
+          <div class="mode-icon">🛠️</div>
+          <h2 class="mode-title">Creador y Gestor</h2>
+          <p class="mode-desc">
+            Diseña nuevos cuestionarios de matemáticas, personaliza tiempos y exporta tus juegos en archivo JSON para integrarlos en tu otra plataforma en casa o compartirlos con docentes.
+          </p>
+        </div>
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 20px; color: var(--color-blue); font-weight: 800;">
+          <span>GESTIONAR PREGUNTAS</span>
+          <span style="font-size: 1.5rem;">→</span>
+        </div>
+      </a>
+
+    </div>
+
+    <!-- Sección inferior explicativa -->
+    <div class="glass-panel" style="margin-top: 40px; padding: 30px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px;">
+      <div style="display: flex; align-items: center; gap: 20px;">
+        <div style="font-size: 2.5rem; background: rgba(255,255,255,0.05); width: 64px; height: 64px; border-radius: 16px; display: flex; align-items: center; justify-content: center;">
+          ⚡
+        </div>
+        <div>
+          <h3 style="font-size: 1.3rem; margin-bottom: 4px;">¿Cómo funciona en el salón de clases?</h3>
+          <p style="color: var(--text-muted); font-size: 0.95rem;">
+            El servidor Node.js detecta el Wi-Fi local. Los teléfonos se conectan directo a tu PC sin requerir internet exterior.
+          </p>
+        </div>
+      </div>
+      <div style="display: flex; gap: 12px;">
+        <span style="background: rgba(38, 137, 12, 0.2); color: #4cc900; padding: 8px 16px; border-radius: 8px; font-weight: 700; font-size: 0.9rem;">
+          ✓ 3 Juegos Precargados
+        </span>
+        <span style="background: rgba(19, 104, 206, 0.2); color: #60a5fa; padding: 8px 16px; border-radius: 8px; font-weight: 700; font-size: 0.9rem;">
+          ✓ Exportable a tu Plataforma
+        </span>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/common.js"></script>
+</body>
+</html>
